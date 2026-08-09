@@ -32,19 +32,18 @@ public class Conta {
 
     private final UUID id;
     private final String numero;
-    private final String agencia = AGENCIA;
     private final UUID clienteID;
-    private TipoConta tipoConta;
+    private final TipoConta tipoConta;
     private BigDecimal saldo = BigDecimal.ZERO;
-    private final BigDecimal limiteChequeEspecial;
+    private BigDecimal limiteChequeEspecial;
     private StatusConta status;
     private final LocalDateTime dataCriacao;
 
-    private Conta(UUID id, String numero, UUID ClienteId, TipoConta tipoConta, BigDecimal limiteChequeEspecial,
+    private Conta(UUID id, String numero, UUID clienteId, TipoConta tipoConta, BigDecimal limiteChequeEspecial,
                   StatusConta status, LocalDateTime dataCriacao) {
         this.id = id;
         this.numero = numero;
-        this.clienteID = ClienteId;
+        this.clienteID = clienteId;
         this.tipoConta = tipoConta;
         this.limiteChequeEspecial = limiteChequeEspecial;
         this.status = status;
@@ -89,7 +88,7 @@ public class Conta {
         }
 
         if (!this.status.equals(StatusConta.ATIVA)) {
-            throw new ContaNaoAtivaException("Conta com status" + this.status + ", deposito inválido!");
+            throw new ContaNaoAtivaException("Conta com status " + this.status + ", deposito inválido!");
         }
 
         this.saldo = this.saldo.add(valorDepositado);
@@ -102,7 +101,7 @@ public class Conta {
         }
 
         if (!this.status.equals(StatusConta.ATIVA)) {
-            throw new ContaNaoAtivaException("Conta com status" + this.status + ", saque inválido!");
+            throw new ContaNaoAtivaException("Conta com status " + this.status + ", saque inválido!");
         }
 
         validarSaqueComChequeEspecial(valorSacado);
@@ -129,8 +128,8 @@ public class Conta {
 
     private static void validarLimiteChequeEspecial(BigDecimal limiteChequeEspecial) {
 
-        if (limiteChequeEspecial == null || limiteChequeEspecial.intValue() < 0) {
-            throw new ValorInvalidoException("Limite para cheque especial não pode ser negativo!");
+        if (limiteChequeEspecial == null || limiteChequeEspecial.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Limite para cheque especial não pode ser negativo!");
         }
     }
 
@@ -143,7 +142,7 @@ public class Conta {
     }
 
     public String getAgencia() {
-        return agencia;
+        return AGENCIA;
     }
 
     public UUID getClienteId() {

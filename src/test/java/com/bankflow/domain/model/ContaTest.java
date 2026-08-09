@@ -56,7 +56,7 @@ class ContaTest {
 
             // quando / entao
             assertThatThrownBy(() -> Conta.abrir(CLIENTE_ID, TipoConta.CORRENTE, limiteNegativo))
-                    .isInstanceOf(ValorInvalidoException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

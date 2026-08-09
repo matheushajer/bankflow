@@ -3,7 +3,7 @@
 Projeto de estudo — núcleo de conta digital (Core Banking simplificado) em
 Java 21 + Spring Boot 3, arquitetura hexagonal, SQL Server e Redis.
 
-Consulte `proposta-projeto-bankflow.md` (documento entregue à parte) para a
+Consulte `proposta-projeto-bankflow.md` para a
 visão geral do domínio, entidades, regras de negócio e roteiro completo em
 8 fases.
 
@@ -45,18 +45,3 @@ Cada pacote tem um `_README.md` temporário explicando a sua responsabilidade.
    ```bash
    mvn spring-boot:run
    ```
-
-> Se preferir não instalar o Maven localmente, gere o wrapper com
-> `mvn -N wrapper:wrapper` na raiz do projeto (ou use a IDE, que geralmente
-> já traz Maven embutido) e passe a usar `./mvnw` no lugar de `mvn`.
-
-> Nota: como está agora, o projeto sobe mas ainda não expõe nenhum endpoint —
-> isso é esperado. A ideia é começar pela Fase 1 (domínio em Java puro,
-> guiado por testes) antes de plugar Spring/JPA.
-
-## Onde começar
-
-Comece por `domain/model`, escrevendo primeiro o teste (em
-`src/test/java/com/bankflow/domain/model`) e só depois a classe que o faz
-passar. Sugestão de ordem: `Cliente` -> `Conta` -> `Transacao` ->
-`LimiteDiario`.

@@ -1,0 +1,8 @@
+-- Migration inicial (placeholder).
+-- Na fase 2 do roteiro (Persistencia), substitua este arquivo pelas
+-- migrations reais: V1__create_cliente.sql, V2__create_conta.sql,
+-- V3__create_transacao.sql, V4__create_limite_diario.sql, etc.
+--
+-- Dica: uma tabela por migration, nomes de coluna em snake_case,
+-- sempre com PK, FKs explicitas e indices nos campos usados em WHERE
+-- (ex: cpf, numero_conta, chave_idempotencia).

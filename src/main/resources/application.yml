@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: bankflow
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=bankflow;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: BankFlow#2026
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.bankflow: DEBUG

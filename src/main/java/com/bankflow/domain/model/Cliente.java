@@ -43,6 +43,18 @@ public class Cliente {
         this.status = status;
     }
 
+    /**
+     * Reconstroi um Cliente a partir de dados ja persistidos, SEM executar as
+     * validacoes de negocio de {@link #criar}.
+     * <p>
+     * Uso exclusivo da camada de persistencia (adapters JPA) para reidratar
+     * uma entidade ja existente e valida a partir do banco. Criacao de um
+     * cliente novo continua sendo feita exclusivamente via {@link #criar}.
+     */
+    public static Cliente restaurar(UUID id, String nome, String cpf, LocalDate dataNascimento, String email, StatusCliente status) {
+        return new Cliente(id, nome, cpf, dataNascimento, email, status);
+    }
+
     public static Cliente criar(String nome, String cpf, LocalDate dataNascimento, String email) {
         validarNome(nome);
         validarEmail(email);

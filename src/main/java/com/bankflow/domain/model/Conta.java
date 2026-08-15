@@ -34,20 +34,33 @@ public class Conta {
     private final String numero;
     private final UUID clienteID;
     private final TipoConta tipoConta;
-    private BigDecimal saldo = BigDecimal.ZERO;
+    private BigDecimal saldo;
     private BigDecimal limiteChequeEspecial;
     private StatusConta status;
     private final LocalDateTime dataCriacao;
 
-    private Conta(UUID id, String numero, UUID clienteId, TipoConta tipoConta, BigDecimal limiteChequeEspecial,
-                  StatusConta status, LocalDateTime dataCriacao) {
+    /**
+     * Carona tecnica para lock otimista na persistencia (ver
+     * {@code ContaJpaEntity#version} e {@code ContaRepositoryJpaAdapter}).
+     * NAO e uma regra de negocio - nenhum metodo do dominio le ou decide
+     * nada com base neste campo, ele so trafega de {@link #restaurar} de
+     * volta para o adapter no proximo {@code salvar()}, para que o
+     * Hibernate consiga detectar se a conta foi alterada por outra
+     * transacao entre a leitura e a escrita.
+     */
+    private final long version;
+
+    private Conta(UUID id, String numero, UUID clienteId, TipoConta tipoConta, BigDecimal saldo, BigDecimal limiteChequeEspecial,
+                  StatusConta status, LocalDateTime dataCriacao, long version) {
         this.id = id;
         this.numero = numero;
         this.clienteID = clienteId;
         this.tipoConta = tipoConta;
+        this.saldo = saldo;
         this.limiteChequeEspecial = limiteChequeEspecial;
         this.status = status;
         this.dataCriacao = dataCriacao;
+        this.version = version;
 
     }
 
@@ -55,8 +68,27 @@ public class Conta {
 
         validarLimiteChequeEspecial(limiteChequeEspecial);
 
-        return new Conta(UUID.randomUUID(), gerarNumeroContaAleatorio(), clienteId, tipo, limiteChequeEspecial, StatusConta.ATIVA, LocalDateTime.now());
+        return new Conta(UUID.randomUUID(), gerarNumeroContaAleatorio(), clienteId, tipo, BigDecimal.ZERO, limiteChequeEspecial, StatusConta.ATIVA, LocalDateTime.now(), 0L);
 
+    }
+
+    /**
+     * Reconstroi uma Conta a partir de dados ja persistidos, SEM executar as
+     * validacoes de negocio de {@link #abrir}.
+     * <p>
+     * Uso exclusivo da camada de persistencia (adapters JPA) para reidratar
+     * uma entidade ja existente e valida a partir do banco (inclusive com
+     * saldo diferente de zero). Criacao de uma conta nova continua sendo
+     * feita exclusivamente via {@link #abrir}.
+     * <p>
+     * {@code version} deve vir sempre do valor lido no banco
+     * ({@code ContaJpaEntity#getVersion()}) - e o que permite ao adapter
+     * detectar, no proximo {@code salvar()}, se essa Conta ficou
+     * desatualizada por causa de outra escrita concorrente.
+     */
+    public static Conta restaurar(UUID id, String numero, UUID clienteId, TipoConta tipoConta, BigDecimal saldo,
+                                   BigDecimal limiteChequeEspecial, StatusConta status, LocalDateTime dataCriacao, long version) {
+        return new Conta(id, numero, clienteId, tipoConta, saldo, limiteChequeEspecial, status, dataCriacao, version);
     }
 
     private static String gerarNumeroContaAleatorio() {
@@ -167,6 +199,16 @@ public class Conta {
 
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
+    }
+
+    /**
+     * Carona tecnica de infraestrutura - ver o javadoc do campo
+     * {@code version}. Nao deve ser usado em regra de negocio nem em
+     * casos de uso; existe so para {@code ContaRepositoryJpaAdapter}
+     * repassar ao Hibernate no proximo save.
+     */
+    public long getVersion() {
+        return version;
     }
 
 }
